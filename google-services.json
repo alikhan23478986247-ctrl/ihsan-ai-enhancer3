@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1048618380172",
+    "project_id": "ihsan-ai-enhancer",
+    "storage_bucket": "ihsan-ai-enhancer.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1048618380172:android:63f1838be9a0a7748fc4a9",
+        "android_client_info": {
+          "package_name": "com.ihsan.aienhancer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDVckDcxVZsfCIsGEmGovKiMFdt42sjx4w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,79 @@
+name: Build Release APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:   # allow manual trigger from GitHub Actions tab
+
+jobs:
+  build:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+
+    steps:
+      # ── 1. Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # ── 2. Java 17 ─────────────────────────────────────────────────────────
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      # ── 3. Flutter 3.22.2 ──────────────────────────────────────────────────
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.2'
+          channel: 'stable'
+          cache: true
+
+      # ── 4. Verify tools ────────────────────────────────────────────────────
+      - name: Verify environment
+        run: |
+          java -version
+          flutter --version
+          flutter doctor -v
+
+      # ── 5. pub get ─────────────────────────────────────────────────────────
+      - name: Install Flutter dependencies
+        run: flutter pub get
+
+      # ── 6. Ensure google-services.json is in place ─────────────────────────
+      - name: Verify google-services.json
+        run: |
+          ls -la android/app/google-services.json
+          echo "google-services.json present ✓"
+
+      # ── 7. Build release APK ───────────────────────────────────────────────
+      - name: Build release APK
+        run: flutter build apk --release --no-shrink
+        # --no-shrink keeps the APK simpler; remove it once you have a proper
+        # signing keystore configured.
+
+      # ── 8. Rename and list artifact ────────────────────────────────────────
+      - name: Rename APK
+        run: |
+          mkdir -p output
+          cp build/app/outputs/flutter-apk/app-release.apk \
+             output/IHSAN_AI_Enhancer_v1.0.0.apk
+          ls -lh output/
+
+      # ── 9. Upload APK as GitHub Actions artifact ───────────────────────────
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: IHSAN-AI-Enhancer-APK
+          path: output/IHSAN_AI_Enhancer_v1.0.0.apk
+          retention-days: 30   # artifact stays available for 30 days
+
+      # ── 10. Create GitHub Release (only on version tags) ───────────────────
+      - name: Create GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: output/IHSAN_AI_Enhancer_v1.0.0.apk
+          generate_release_notes: true
